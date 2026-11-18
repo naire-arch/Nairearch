@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The NaireArch by Waziri - Clinical Nutrition Hub</title>
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #f0fdfa;
+        }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.5; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--border); }
+        header h1 { margin: 0; color: var(--primary); font-size: 1.8rem; }
+        header p { margin: 4px 0 0; color: var(--muted); font-size: 0.95rem; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .card h2 { margin-top: 0; font-size: 1.2rem; color: var(--primary-dark); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+        input, select { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        
+        .row { display: flex; gap: 10px; }
+        .row > div { flex: 1; }
+        
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 8px; }
+        button:hover { background: var(--primary-dark); }
+        button.secondary { background: #475569; margin-top: 16px; }
+        button.secondary:hover { background: #334155; }
+
+        .result-box { background: var(--accent); border-left: 4px solid var(--primary); padding: 12px; margin-top: 14px; border-radius: 4px; font-size: 0.9rem; }
+        .result-box strong { color: var(--primary-dark); }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        .low { background: #dcfce7; color: #166534; }
+        .med { background: #fef9c3; color: #854d0e; }
+        .high { background: #fee2e2; color: #991b1b; }
+
+        .summary-panel { margin-top: 24px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+        textarea { width: 100%; height: 110px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-family: monospace; font-size: 0.85rem; resize: vertical; }
+        footer { text-align: center; margin-top: 30px; font-size: 0.8rem; color: var(--muted); }
+        .disclaimer { margin-top: 12px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>The NaireArch by Waziri</h1>
+        <p>All-in-One Bedside Clinical Nutrition Toolkit for Doctors, Nurses & Dietitians</p>
+    </header>
+
+    <div class="grid">
+        <!-- 1. ANTHROPOMETRICS & ENERGY -->
+        <div class="card">
+            <h2>1. Anthropometrics & Energy</h2>
+            <div class="row">
+                <div class="form-group">
+                    <label>Sex</label>
+                    <select id="sex">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Age (yrs)</label>
+                    <input type="number" id="age" placeholder="e.g. 45" min="18" max="120">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="weight" placeholder="e.g. 70" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Height (cm)</label>
+                    <input type="number" id="height" placeholder="e.g. 175" step="0.1">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Activity / Stress Factor</label>
+                <select id="activity">
+                    <option value="1.2">1.2 - Bedbound / Sedentary</option>
+                    <option value="1.3">1.3 - Light / Post-op</option>
+                    <option value="1.5">1.5 - Moderate Infection / Trauma</option>
+                    <option value="1.7">1.7 - Severe Sepsis / Burns</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Protein Target (g/kg/day)</label>
+                <select id="proteinFactor">
+                    <option value="0.8">0.8 g/kg (Maintenance)</option>
+                    <option value="1.2" selected>1.2 g/kg (General Clinical / Illness)</option>
+                    <option value="1.5">1.5 g/kg (Catabolic / Wound Healing)</option>
+                    <option value="2.0">2.0 g/kg (Critical Care / Burns)</option>
+                </select>
+            </div>
+            <button onclick="calculateNutrition()">Calculate Needs</button>
+            <div class="result-box" id="nutriResult">Enter patient metrics to calculate BMI, IBW, Calories, and Protein.</div>
+        </div>
+
+        <!-- 2. MALNUTRITION SCREENING (MUST) -->
+        <div class="card">
+            <h2>2. Malnutrition Screen (MUST)</h2>
+            <div class="form-group">
+                <label>BMI Score (Auto-filled or Select)</label>
+                <select id="mustBmi">
+                    <option value="0">BMI > 20.0 (0 pts)</option>
+                    <option value="1">BMI 18.5 – 20.0 (1 pt)</option>
+                    <option value="2">BMI < 18.5 (2 pts)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Unplanned Weight Loss (Past 3–6 Months)</label>
+                <select id="mustLoss">
+                    <option value="0">< 5% weight loss (0 pts)</option>
+                    <option value="1">5% – 10% weight loss (1 pt)</option>
+                    <option value="2">> 10% weight loss (2 pts)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Acute Disease Effect</label>
+                <select id="mustAcute">
+                    <option value="0">No acute illness effect (0 pts)</option>
+                    <option value="2">Acutely ill & no intake > 5 days (2 pts)</option>
+                </select>
+            </div>
+            <button onclick="calculateMUST()">Score MUST Risk</button>
+            <div class="result-box" id="mustResult">Select screening criteria to determine malnutrition risk level.</div>
+        </div>
+
+        <!-- 3. ENTERAL TUBE FEEDING CALCULATOR -->
+        <div class="card">
+            <h2>3. Enteral Feeding Rate</h2>
+            <div class="form-group">
+                <label>Target Calories (kcal/day)</label>
+                <input type="number" id="targetKcal" placeholder="Auto-fills from Step 1">
+            </div>
+            <div class="form-group">
+                <label>Formula Density (kcal/mL)</label>
+                <select id="formulaDensity">
+                    <option value="1.0">1.0 kcal/mL (Standard Isotonic)</option>
+                    <option value="1.2">1.2 kcal/mL (High Protein / Standard)</option>
+                    <option value="1.5">1.5 kcal/mL (Calorically Dense)</option>
+                    <option value="2.0">2.0 kcal/mL (Fluid Restricted / Renal)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Infusion Schedule (Hours/day)</label>
+                <select id="infusionHours">
+                    <option value="24">24 Hours (Continuous)</option>
+                    <option value="20">20 Hours (Cycled)</option>
+                    <option value="16">16 Hours (Nocturnal / Day)</option>
+                    <option value="12">12 Hours (Overnight)</option>
+                </select>
+            </div>
+            <button onclick="calculateTubeFeed()">Calculate Pump Rate</button>
+            <div class="result-box" id="feedResult">Enter target calories and formula density to get hourly pump rate.</div>
+        </div>
+    </div>
+
+    <!-- CLINICAL CHARTING NOTE GENERATOR -->
+    <div class="summary-panel">
+        <h2>Charting Summary Note (Copy to EHR)</h2>
+        <textarea id="chartNote" readonly placeholder="Calculated nutrition assessment summary will appear here for easy copy-pasting into patient notes..."></textarea>
+        <button class="secondary" onclick="copyNote()">Copy Note to Clipboard</button>
+    </div>
+
+    <footer>
+        <div>The NaireArch by Waziri — Client-side clinical support tool. Runs locally in your browser—no patient data is stored or transmitted. Verify all calculations per institutional protocol.</div>
+        <div class="disclaimer">This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.</div>
+    </footer>
+</div>
+
+<script>
+    let state = { bmi: null, ibw: null, adjBw: null, kcal: null, protein: null, fluid: null, mustText: "Not screened", feedText: "Not calculated" };
+
+    function calculateNutrition() {
+        const sex = document.getElementById('sex').value;
+        const age = parseFloat(document.getElementById('age').value);
+        const wt = parseFloat(document.getElementById('weight').value);
+        const ht = parseFloat(document.getElementById('height').value);
+        const act = parseFloat(document.getElementById('activity').value);
+        const protFactor = parseFloat(document.getElementById('proteinFactor').value);
+
+        if (!age || !wt || !ht) {
+            alert("Please enter Age, Weight, and Height.");
+            return;
+        }
+
+        const htM = ht / 100;
+        const bmi = wt / (htM * htM);
+        
+        // Devine Formula for IBW
+        const htInches = ht / 2.54;
+        const over60 = Math.max(0, htInches - 60);
+        const ibw = sex === 'male' ? 50 + (2.3 * over60) : 45.5 + (2.3 * over60);
+        
+        // Adjusted Body Weight if obese (BMI >= 30)
+        const adjBw = bmi >= 30 ? ibw + 0.25 * (wt - ibw) : wt;
+        const calcWt = bmi >= 30 ? adjBw : wt;
+
+        // Mifflin-St Jeor BMR
+        let bmr = (10 * calcWt) + (6.25 * ht) - (5 * age);
+        bmr += (sex === 'male') ? 5 : -161;
+
+        const tdee = Math.round(bmr * act);
+        const protein = Math.round(calcWt * protFactor);
+        const fluid = Math.round(wt * 30);
+
+        // Auto-update MUST BMI dropdown & Tube Feed Target
+        const mustBmiSelect = document.getElementById('mustBmi');
+        if (bmi < 18.5) mustBmiSelect.value = "2";
+        else if (bmi <= 20.0) mustBmiSelect.value = "1";
+        else mustBmiSelect.value = "0";
+
+        document.getElementById('targetKcal').value = tdee;
+
+        state.bmi = bmi.toFixed(1);
+        state.ibw = ibw.toFixed(1);
+        state.adjBw = bmi >= 30 ? adjBw.toFixed(1) + " kg (AdjBW)" : "N/A";
+        state.kcal = tdee;
+        state.protein = protein;
+        state.fluid = fluid;
+
+        document.getElementById('nutriResult').innerHTML = `
+            <strong>BMI:</strong> ${state.bmi} kg/m² | <strong>IBW:</strong> ${state.ibw} kg<br>
+            ${bmi >= 30 ? `<strong>Adjusted BW (used):</strong> ${adjBw.toFixed(1)} kg<br>` : ''}
+            <strong>Energy Target:</strong> ${tdee} kcal/day<br>
+            <strong>Protein Target:</strong> ${protein} g/day (${protFactor} g/kg)<br>
+            <strong>Est. Fluid Needs:</strong> ${fluid} mL/day (30 mL/kg)
+        `;
+        updateChartNote();
+    }
+
+    function calculateMUST() {
+        const score = parseInt(document.getElementById('mustBmi').value) +
+                      parseInt(document.getElementById('mustLoss').value) +
+                      parseInt(document.getElementById('mustAcute').value);
+
+        let risk = "", badge = "", action = "";
+        if (score === 0) {
+            risk = "Low Risk"; badge = "low"; action = "Routine clinical care; repeat screening weekly.";
+        } else if (score === 1) {
+            risk = "Medium Risk"; badge = "med"; action = "Observe; document dietary intake for 3 days.";
+        } else {
+            risk = "High Risk"; badge = "high"; action = "Treat; refer to Dietitian for full nutrition support plan.";
+        }
+
+        state.mustText = `Score ${score} (${risk})`;
+        document.getElementById('mustResult').innerHTML = `
+            <strong>MUST Score:</strong> ${score} — <span class="badge ${badge}">${risk}</span><br>
+            <strong>Action:</strong> ${action}
+        `;
+        updateChartNote();
+    }
+
+    function calculateTubeFeed() {
+        const kcal = parseFloat(document.getElementById('targetKcal').value);
+        const density = parseFloat(document.getElementById('formulaDensity').value);
+        const hours = parseFloat(document.getElementById('infusionHours').value);
+
+        if (!kcal) {
+            alert("Please enter Target Calories.");
+            return;
+        }
+
+        const totalVol = Math.round(kcal / density);
+        const rate = Math.round(totalVol / hours);
+
+        state.feedText = `${rate} mL/hr over ${hours} hrs (${totalVol} mL/day of ${density} kcal/mL formula)`;
+        document.getElementById('feedResult').innerHTML = `
+            <strong>Total Volume:</strong> ${totalVol} mL/day<br>
+            <strong>Goal Pump Rate:</strong> ${rate} mL/hr (over ${hours} hrs)
+        `;
+        updateChartNote();
+    }
+
+    function updateChartNote() {
+        if (!state.kcal) return;
+        const note = `CLINICAL NUTRITION ASSESSMENT SUMMARY (The NaireArch by Waziri):\n` +
+            `- Anthropometrics: BMI ${state.bmi} kg/m² | IBW: ${state.ibw} kg | AdjBW: ${state.adjBw}\n` +
+            `- Estimated Needs: ${state.kcal} kcal/day | ${state.protein} g protein/day | ${state.fluid} mL fluid/day\n` +
+            `- Malnutrition Screen (MUST): ${state.mustText}\n` +
+            `- Enteral Plan: ${state.feedText}`;
+        document.getElementById('chartNote').value = note;
+    }
+
+    function copyNote() {
+        const note = document.getElementById('chartNote');
+        if (!note.value) return;
+        note.select();
+        navigator.clipboard.writeText(note.value);
+        alert("Charting note copied to clipboard!");
+    }
+</script>
+
+</body>
+</html>
